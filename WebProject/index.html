@@ -1,8 +1,9 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShoppingLists</title>
 
     <!-- Bootstrap 5 -->
@@ -11,13 +12,11 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800&display=swap" rel="stylesheet" />
 
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
 
 <!-- Navbar -->
@@ -44,84 +43,27 @@
         </aside>
 
         <!-- Hauptbereich -->
-        <main class="col-md-6 main" id="hauptinhalt">
-            <div class="d-flex justify-content-between align-items-center mb-4" id="aktive-liste-kopf">
-                <!-- Titel der aktiven Liste + "Abschließen"-Button -->
-            </div>
-            <ul class="list-group" id="artikel-liste">
-                <!-- Dynamische Artikelliste -->
-            </ul>
-            <div class="mt-4">
-                <button class="btn btn-outline-success" id="artikel-hinzufuegen-btn">
-                    <i class="bi bi-plus-circle"></i> Artikel hinzufügen
-                </button>
-            </div>
+        <main class="col-md-6 main" id="detail-view">
+            <!-- Wird per JS befüllt -->
         </main>
 
-        <!-- Kontextbereich (z. B. Artikel hinzufügen / Filtern) -->
+        <!-- Kontextbereich: Artikel-Auswahl -->
         <aside class="col-md-3 context-panel d-none" id="rechte-sidebar">
-            <!-- Dynamisch gefüllt -->
+            <div class="d-flex justify-content-between align-items-center">
+                <h5>Artikel hinzufügen</h5>
+                <button class="btn btn-sm btn-outline-secondary" id="close-sidebar">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <ul class="list-group mt-3" id="available-items-list">
+                <!-- Verfügbare Artikel -->
+            </ul>
+            <div class="mt-3">
+                <input type="number" id="item-quantity" min="1" value="1" class="form-control mb-2">
+                <button class="btn btn-success w-100" id="add-selected-item">+ Hinzufügen</button>
+            </div>
         </aside>
 
-    </div>
-</div>
-
-<!-- Modal: Filter nach Tags -->
-<div class="modal fade" id="filterModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content rounded-3 shadow">
-            <div class="modal-header">
-                <h5 class="modal-title">Tags filtern</h5>
-                <button class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="filter-form">
-                    <div id="tag-filter-checkboxes" class="d-flex flex-column gap-2"></div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
-                <button class="btn btn-primary" id="filter-apply-btn">Anwenden</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Tag löschen -->
-<div class="modal fade" id="deleteTagModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content rounded-3">
-            <div class="modal-header">
-                <h5 class="modal-title">Tag löschen</h5>
-                <button class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Willst du dieses Tag wirklich löschen?</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                <button class="btn btn-danger" id="confirmDeleteTag">Löschen</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Artikel löschen -->
-<div class="modal fade" id="deleteItemModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content rounded-3">
-            <div class="modal-header">
-                <h5 class="modal-title">Artikel löschen</h5>
-                <button class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Soll dieser Artikel wirklich entfernt werden?</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                <button class="btn btn-danger" id="confirmDeleteItem">Löschen</button>
-            </div>
-        </div>
     </div>
 </div>
 
