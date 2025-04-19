@@ -1,0 +1,62 @@
+body {
+    font-family: 'Figtree', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.navbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+}
+
+.navbar-brand {
+    font-weight: 800;
+    color: #00796b;
+    font-size: 1.5rem;
+}
+
+.sidebar {
+    background-color: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    height: 100vh;
+    padding-top: 1rem;
+}
+
+.sidebar h5 {
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 1rem;
+}
+
+.main {
+    padding: 2rem;
+}
+
+.btn-primary {
+    background-color: #00796b;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #004d40;
+}
+
+.list-group-item {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: #f1f1f1;
+}
+
+.context-panel {
+    background-color: #fdfdfd;
+    border-left: 1px solid #e0e0e0;
+    padding: 1rem;
+    height: 100vh;
+}
+
+.modal-header {
+    background-color: #f0f0f0;
+}
