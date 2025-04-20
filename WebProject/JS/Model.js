@@ -8,11 +8,14 @@ export default class Model extends Subject {
         super();
         this.lists = [];
         this.availableItems = [
-            new Item('Milch'),
-            new Item('Brot'),
-            new Item('Äpfel'),
-            new Item('Karotten'),
+            new Item('Milch', 1, 'Getränke'),
+            new Item('Brot', 1, 'Backwaren'),
+            new Item('Äpfel', 1, 'Obst'),
+            new Item('Karotten', 1, 'Gemüse')
         ];
+
+        this.tags = ['Obst', 'Gemüse', 'Getränke', 'Backwaren'];
+
     }
 
     createList(title, creator) {
@@ -89,4 +92,54 @@ export default class Model extends Subject {
             this.notify({ type: 'list-updated', listId });
         }
     }
+
+    getAvailableItemsByTag(tag) {
+        return this.availableItems.filter(item => item.tag === tag);
+    }
+
+    getAvailableItemsByTags(selectedTags) {
+        if (!selectedTags.length) return this.availableItems;
+        return this.availableItems.filter(item =>
+            selectedTags.includes(item.tag)
+        );
+    }
+
+    getAllTags() {
+        return [...this.tags];
+    }
+
+
+    getTags() {
+        return this.tags;
+    }
+
+    addTag(tagName) {
+        if (!this.tags.includes(tagName)) {
+            this.tags.push(tagName);
+            this.notify({ type: 'tag-added', tag: tagName });
+        }
+    }
+
+    deleteTag(tagName) {
+        const isUsed = this.availableItems.some(item => item.tag === tagName);
+        if (isUsed) {
+            alert('Tag kann nicht gelöscht werden – wird noch verwendet.');
+            return false;
+        }
+
+        this.tags = this.tags.filter(t => t !== tagName);
+        this.notify({ type: 'tag-deleted', tag: tagName });
+        return true;
+    }
+
+    updateListTitle(listId, newTitle) {
+        const list = this.lists.find(l => l.id === listId);
+        if (list && newTitle.trim()) {
+            list.title = newTitle.trim();
+            this.notify({ type: 'list-updated', list });
+        }
+    }
+
+
+
 }

@@ -1,4 +1,3 @@
-// controller.js
 import Model from './model.js';
 import View from './view.js';
 import User from './Klassen/User.js';
@@ -11,7 +10,7 @@ export default class Controller {
         this.selectedItemId = null;
 
         this.model.subscribe(event => {
-            if (["list-created", "list-deleted", "item-added", "item-toggled", "item-removed", "list-updated"].includes(event.type)) {
+            if (["list-created", "list-deleted", "item-added", "item-toggled", "item-removed", "list-updated", "available-item-added", "tag-added", "tag-removed"].includes(event.type)) {
                 if (event.type === 'list-created' || event.type === 'list-deleted') {
                     this.view.renderListen(this.model.lists);
                     this.view.detailViewContainer.innerHTML = '';
@@ -26,11 +25,18 @@ export default class Controller {
                     this.setupAddItemButton();
                     this.setupItemEvents(this.activeList);
                     this.setupListStatusButton(this.activeList);
+                    this.setupEditListTitleButton(this.activeList);
                 }
-            }
-            if (event.type === 'available-item-added') {
-                const items = this.model.getAvailableItems();
-                this.view.renderAvailableItems(items);
+
+                if (event.type === 'available-item-added') {
+                    this.view.renderAvailableItems(this.model.getAvailableItems());
+                }
+
+                if (["tag-added", "tag-removed"].includes(event.type)) {
+                    this.view.renderTags(this.model.getTags());
+                    this.view.renderTagCheckboxes(this.model.getAllTags());
+                    this.view.updateNewArticleTagOptions(this.model.getTags());
+                }
             }
         });
 
@@ -53,13 +59,11 @@ export default class Controller {
                     return;
                 }
 
-
                 if (confirm('Liste wirklich löschen?')) {
                     this.model.deleteList(id);
                 }
                 return;
             }
-
 
             const li = e.target.closest('li');
             if (li && li.dataset.listId) {
@@ -69,11 +73,16 @@ export default class Controller {
                 this.setupAddItemButton();
                 this.setupItemEvents(this.activeList);
                 this.setupListStatusButton(this.activeList);
+                this.setupEditListTitleButton(this.activeList);
             }
         });
 
         this.view.closeSidebarButton.addEventListener('click', () => {
             this.view.toggleRightSidebar(false);
+            this.view.newArticleForm.classList.add('d-none');
+            this.view.availableItemsList.classList.remove('d-none');
+            this.view.itemQuantityInput.parentElement.classList.remove('d-none');
+            this.view.sidebarTitle.textContent = 'Artikel hinzufügen';
         });
 
         this.view.availableItemsList.addEventListener('click', e => {
@@ -104,16 +113,14 @@ export default class Controller {
         this.view.saveNewArticleButton.addEventListener('click', () => {
             const name = this.view.newArticleInput.value.trim();
             const tag = this.view.newArticleTag.value || null;
-            const image = this.view.newArticleImage.value.trim() || null;
             const description = this.view.newArticleDescription.value.trim();
 
             if (name) {
-                const itemData = { name, tag, image, description };
+                const itemData = { name, tag, description };
                 this.model.addAvailableItem(itemData);
 
                 this.view.newArticleInput.value = '';
                 this.view.newArticleTag.value = '';
-                this.view.newArticleImage.value = '';
                 this.view.newArticleDescription.value = '';
 
                 this.view.newArticleForm.classList.add('d-none');
@@ -124,13 +131,47 @@ export default class Controller {
                 alert('Bitte gib einen Artikelnamen ein.');
             }
         });
+
+        this.view.tagFilterCheckboxesContainer.addEventListener('change', () => {
+            const selectedTags = [...this.view.tagFilterCheckboxesContainer.querySelectorAll('input[type="checkbox"]:checked')]
+                .map(cb => cb.value);
+            const filtered = this.model.getAvailableItemsByTags(selectedTags);
+            this.view.renderAvailableItems(filtered);
+        });
+
+        this.view.addTagButton.addEventListener('click', () => {
+            const tagName = this.view.newTagInput.value.trim();
+            if (tagName) {
+                const success = this.model.addTag(tagName);
+                if (success) {
+                    this.view.newTagInput.value = '';
+                } else {
+                    alert('Tag existiert bereits.');
+                }
+            }
+        });
+
+        this.view.tagList.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (btn?.dataset.tag) {
+                const tag = btn.dataset.tag;
+                const used = this.model.isTagInUse(tag);
+                if (used) {
+                    alert('Dieser Tag wird verwendet und kann nicht gelöscht werden.');
+                    return;
+                }
+                this.model.removeTag(tag);
+            }
+        });
     }
 
     setupAddItemButton() {
         if (!this.activeList || this.activeList.completed) return;
+
         this.view.addItemButton?.addEventListener('click', () => {
-            const availableItems = this.model.getAvailableItems();
-            this.view.renderAvailableItems(availableItems);
+            const tags = this.model.getAllTags();
+            this.view.renderTagCheckboxes(tags);
+            this.view.renderAvailableItems(this.model.getAvailableItems());
             this.view.toggleRightSidebar(true);
         });
     }
@@ -160,20 +201,51 @@ export default class Controller {
         const btn = document.getElementById('toggle-list-status');
         if (!btn) return;
 
-        const kannAbgeschlossenWerden = list.items.length === 0 || list.items.every(item => item.completed);
-
-        btn.disabled = !kannAbgeschlossenWerden;
-
+        const closeable = list.items.length === 0 || list.items.every(item => item.completed);
+        btn.disabled = !closeable;
         btn.textContent = list.completed ? 'Liste aktivieren' : 'Liste abschließen';
 
         btn.onclick = () => {
             if (list.completed) {
                 this.model.reopenList(list.id);
-            } else if (kannAbgeschlossenWerden) {
+            } else if (closeable) {
                 this.model.completeList(list.id);
             } else {
                 alert('Alle Items müssen erledigt sein.');
             }
         };
     }
+
+    setupEditListTitleButton(list) {
+        const editBtn = document.getElementById('edit-list-title-btn');
+        const titleContainer = document.getElementById('list-title-edit-container');
+
+        if (!editBtn || !titleContainer) return;
+
+        editBtn.addEventListener('click', () => {
+            titleContainer.innerHTML = `
+            <input type="text" id="edit-title-input" class="form-control form-control-sm me-2" value="${list.title}">
+            <button class="btn btn-sm btn-success" id="save-title-btn">
+                <i class="bi bi-check-lg"></i>
+            </button>
+        `;
+
+            document.getElementById('save-title-btn').addEventListener('click', () => {
+                const input = document.getElementById('edit-title-input');
+                const newTitle = input.value.trim();
+
+                if (newTitle && newTitle !== list.title) {
+                    this.model.updateListTitle(list.id, newTitle);
+                } else {
+                    // Wenn Titel leer oder gleich, einfach wieder zurückwechseln
+                    this.view.renderDetailView(list);
+                    this.setupAddItemButton();
+                    this.setupItemEvents(list);
+                    this.setupListStatusButton(list);
+                    this.setupEditListTitleButton(list);
+                }
+            });
+        });
+    }
+
 }

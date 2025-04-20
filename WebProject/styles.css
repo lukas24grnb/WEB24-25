@@ -68,3 +68,16 @@ body {
     border: 1px solid #dee2e6;
     opacity: 0.7;
 }
+
+
+#rechte-sidebar h6 {
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 0.2rem;
+}
+
+#rechte-sidebar {
+    max-height: 100vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
