@@ -60,3 +60,11 @@ body {
 .modal-header {
     background-color: #f0f0f0;
 }
+
+.list-completed {
+    background-color: #f0f0f0;
+    color: #6c757d;
+    font-style: italic;
+    border: 1px solid #dee2e6;
+    opacity: 0.7;
+}

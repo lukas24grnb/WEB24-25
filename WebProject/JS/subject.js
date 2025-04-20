@@ -6,6 +6,7 @@ export default class Subject {
 
     subscribe(observerFn) {
         this.observers.push(observerFn);
+
     }
 
     unsubscribe(observerFn) {
@@ -15,4 +16,6 @@ export default class Subject {
     notify(data) {
         this.observers.forEach(fn => fn(data));
     }
+
+
 }

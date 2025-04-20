@@ -50,18 +50,42 @@
         <!-- Kontextbereich: Artikel-Auswahl -->
         <aside class="col-md-3 context-panel d-none" id="rechte-sidebar">
             <div class="d-flex justify-content-between align-items-center">
-                <h5>Artikel hinzufügen</h5>
+                <h5 id="sidebar-title">Artikel hinzufügen</h5>
                 <button class="btn btn-sm btn-outline-secondary" id="close-sidebar">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
+
+            <!-- Verfügbare Artikel -->
             <ul class="list-group mt-3" id="available-items-list">
-                <!-- Verfügbare Artikel -->
+                <!-- per JS gefüllt -->
             </ul>
-            <div class="mt-3">
+
+            <!-- Mengeneingabe + Hinzufügen-Button -->
+            <div class="mt-3" id="sidebar-add-controls">
                 <input type="number" id="item-quantity" min="1" value="1" class="form-control mb-2">
                 <button class="btn btn-success w-100" id="add-selected-item">+ Hinzufügen</button>
             </div>
+
+            <!-- Neues Artikel-Formular -->
+            <div id="new-article-form" class="d-none mt-3">
+                <input type="text" id="new-article-input" placeholder="Artikelname" class="form-control mb-2" />
+                <select id="new-article-tag" class="form-select mb-2">
+                    <option value="">Kategorie wählen...</option>
+                    <option value="Obst">Obst</option>
+                    <option value="Gemüse">Gemüse</option>
+                    <option value="Getränke">Getränke</option>
+                    <option value="Haushalt">Haushalt</option>
+                </select>
+                <input type="text" id="new-article-image" placeholder="Bild-URL (optional)" class="form-control mb-2" />
+                <textarea id="new-article-description" class="form-control mb-2" placeholder="Beschreibung (optional)"></textarea>
+                <button class="btn btn-success w-100 mb-2" id="save-new-article-btn">Speichern</button>
+            </div>
+
+            <button class="btn btn-outline-primary w-100 mt-3" id="new-article-btn">
+                <i class="bi bi-plus-lg"></i> Neuer Artikel...
+            </button>
+
         </aside>
 
     </div>
