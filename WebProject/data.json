@@ -1,0 +1,81 @@
+{
+  "tags": ["Obst", "Gemüse", "Getränke", "Haushalt", "Backwaren", "Drogerie"],
+
+  "availableItems": [
+    {
+      "id": 1,
+      "name": "🍎 Äpfel",
+      "quantity": 1,
+      "tag": "Obst",
+      "description": "Frisch vom Baum"
+    },
+    {
+      "id": 2,
+      "name": "🥕 Karotten",
+      "quantity": 1,
+      "tag": "Gemüse",
+      "description": "Bio Karotten"
+    },
+    {
+      "id": 3,
+      "name": "🥛 Milch",
+      "quantity": 1,
+      "tag": "Getränke",
+      "description": "Fettarme H-Milch"
+    },
+    {
+      "id": 4,
+      "name": "🍞 Brot",
+      "quantity": 1,
+      "tag": "Backwaren",
+      "description": "Vollkornbrot"
+    },
+    {
+      "id": 5,
+      "name": "🧻 Toilettenpapier",
+      "quantity": 1,
+      "tag": "Drogerie",
+      "description": "3-lagig, Recyclingpapier"
+    }
+  ],
+
+  "lists": [
+    {
+      "id": 101,
+      "title": "Wocheneinkauf",
+      "creator": { "firstName": "Max", "lastName": "Mustermann" },
+      "completed": false,
+      "items": [
+        {
+          "id": 1001,
+          "name": "🍎 Äpfel",
+          "quantity": 2,
+          "tag": "Obst",
+          "description": "Frisch vom Baum"
+        },
+        {
+          "id": 1002,
+          "name": "🥛 Milch",
+          "quantity": 1,
+          "tag": "Getränke",
+          "description": "Fettarme H-Milch"
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "title": "Drogerie",
+      "creator": { "firstName": "Lisa", "lastName": "Musterfrau" },
+      "completed": false,
+      "items": [
+        {
+          "id": 1003,
+          "name": "🧻 Toilettenpapier",
+          "quantity": 1,
+          "tag": "Drogerie",
+          "description": "3-lagig, Recyclingpapier"
+        }
+      ]
+    }
+  ]
+}

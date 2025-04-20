@@ -1,3 +1,4 @@
+// model.js
 import Subject from './subject.js';
 import List from './Klassen/List.js';
 import Item from './Klassen/Item.js';
@@ -7,20 +8,13 @@ export default class Model extends Subject {
     constructor() {
         super();
         this.lists = [];
-        this.availableItems = [
-            new Item('Milch', 1, 'Getränke'),
-            new Item('Brot', 1, 'Backwaren'),
-            new Item('Äpfel', 1, 'Obst'),
-            new Item('Karotten', 1, 'Gemüse')
-        ];
-
-        this.tags = ['Obst', 'Gemüse', 'Getränke', 'Backwaren'];
-
+        this.availableItems = [];
+        this.tags = [];
     }
 
+    // --- LISTEN ---
     createList(title, creator) {
         const newList = new List(title, creator);
-        newList.completed = false;
         this.lists.push(newList);
         this.notify({ type: 'list-created', list: newList });
         return newList;
@@ -34,46 +28,11 @@ export default class Model extends Subject {
         }
     }
 
-    getAvailableItems() {
-        return this.availableItems;
-    }
-
-    addExistingItemToList(listId, itemId, quantity = 1) {
+    updateListTitle(listId, newTitle) {
         const list = this.lists.find(l => l.id === listId);
-        const itemTemplate = this.availableItems.find(i => i.id === itemId);
-        if (list && itemTemplate && !list.completed) {
-            const newItem = new Item(
-                itemTemplate.name,
-                quantity,
-                itemTemplate.tag,
-                itemTemplate.image,
-                itemTemplate.description
-            );
-            list.addItem(newItem);
-            this.notify({ type: 'item-added', listId, item: newItem });
-        }
-    }
-
-    addAvailableItem({ name, tag = null, image = null, description = '' }) {
-        const newItem = new Item(name, 1, tag, image, description);
-        this.availableItems.push(newItem);
-        this.notify({ type: 'available-item-added', item: newItem });
-    }
-
-    toggleItemCompleted(listId, itemId) {
-        const list = this.lists.find(l => l.id === listId);
-        const item = list?.items.find(i => i.id === itemId);
-        if (item) {
-            item.toggleCompleted();
-            this.notify({ type: 'item-toggled', listId, item });
-        }
-    }
-
-    removeItemFromList(listId, itemId) {
-        const list = this.lists.find(l => l.id === listId);
-        if (list) {
-            list.removeItem(itemId);
-            this.notify({ type: 'item-removed', listId, itemId });
+        if (list && newTitle.trim()) {
+            list.title = newTitle.trim();
+            this.notify({ type: 'list-updated', listId: list.id });
         }
     }
 
@@ -93,21 +52,63 @@ export default class Model extends Subject {
         }
     }
 
+    // --- ITEMS ---
+    getAvailableItems() {
+        return this.availableItems;
+    }
+
     getAvailableItemsByTag(tag) {
         return this.availableItems.filter(item => item.tag === tag);
     }
 
-    getAvailableItemsByTags(selectedTags) {
-        if (!selectedTags.length) return this.availableItems;
-        return this.availableItems.filter(item =>
-            selectedTags.includes(item.tag)
-        );
+    getAvailableItemsByTags(tags) {
+        if (!tags.length) return this.availableItems;
+        return this.availableItems.filter(item => tags.includes(item.tag));
     }
 
+    addAvailableItem({ name, tag = null, image = null, description = '' }) {
+        const newItem = new Item(name, 1, tag, image, description);
+        this.availableItems.push(newItem);
+        this.notify({ type: 'available-item-added', item: newItem });
+    }
+
+    addExistingItemToList(listId, itemId, quantity = 1) {
+        const list = this.lists.find(l => l.id === listId);
+        const template = this.availableItems.find(i => i.id === itemId);
+        if (list && template && !list.completed) {
+            const newItem = new Item(
+                template.name,
+                quantity,
+                template.tag,
+                template.image,
+                template.description
+            );
+            list.addItem(newItem);
+            this.notify({ type: 'item-added', listId, item: newItem });
+        }
+    }
+
+    toggleItemCompleted(listId, itemId) {
+        const list = this.lists.find(l => l.id === listId);
+        const item = list?.items.find(i => i.id === itemId);
+        if (item) {
+            item.toggleCompleted();
+            this.notify({ type: 'item-toggled', listId, item });
+        }
+    }
+
+    removeItemFromList(listId, itemId) {
+        const list = this.lists.find(l => l.id === listId);
+        if (list) {
+            list.removeItem(itemId);
+            this.notify({ type: 'item-removed', listId, itemId });
+        }
+    }
+
+    // --- TAGS ---
     getAllTags() {
         return [...this.tags];
     }
-
 
     getTags() {
         return this.tags;
@@ -117,29 +118,55 @@ export default class Model extends Subject {
         if (!this.tags.includes(tagName)) {
             this.tags.push(tagName);
             this.notify({ type: 'tag-added', tag: tagName });
+            return true;
         }
+        return false;
     }
 
-    deleteTag(tagName) {
+    removeTag(tagName) {
         const isUsed = this.availableItems.some(item => item.tag === tagName);
-        if (isUsed) {
-            alert('Tag kann nicht gelöscht werden – wird noch verwendet.');
-            return false;
-        }
+        if (isUsed) return false;
 
         this.tags = this.tags.filter(t => t !== tagName);
-        this.notify({ type: 'tag-deleted', tag: tagName });
+        this.notify({ type: 'tag-removed', tag: tagName });
         return true;
     }
 
-    updateListTitle(listId, newTitle) {
-        const list = this.lists.find(l => l.id === listId);
-        if (list && newTitle.trim()) {
-            list.title = newTitle.trim();
-            this.notify({ type: 'list-updated', list });
-        }
+    isTagInUse(tag) {
+        return this.availableItems.some(item => item.tag === tag);
     }
 
+    // --- INITIALDATEN LADEN ---
+    loadInitialData(data) {
+        console.log("Geladene Listen:", this.lists);
+        this.tags = data.tags || [];
 
+        this.availableItems = (data.availableItems || []).map(i => new Item(
+            i.name,
+            i.quantity,
+            i.tag,
+            i.image,
+            i.description
+        ));
+
+        this.lists = (data.lists || []).map(listData => {
+            const user = new User(listData.creator.firstName, listData.creator.lastName);
+            const list = new List(listData.title, user);
+            list.id = parseInt(listData.id, 10); // <-- sicherstellen, dass es eine Zahl ist!
+            list.completed = listData.completed;
+
+            list.items = (listData.items || []).map(item => new Item(
+                item.name,
+                item.quantity,
+                item.tag,
+                item.image,
+                item.description
+            ));
+
+            return list;
+        });
+
+        this.notify({ type: 'list-created' });
+    }
 
 }

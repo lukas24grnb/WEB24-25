@@ -1,3 +1,4 @@
+// Controller.js
 import Model from './model.js';
 import View from './view.js';
 import User from './Klassen/User.js';
@@ -11,16 +12,15 @@ export default class Controller {
 
         this.model.subscribe(event => {
             if (["list-created", "list-deleted", "item-added", "item-toggled", "item-removed", "list-updated", "available-item-added", "tag-added", "tag-removed"].includes(event.type)) {
-                if (event.type === 'list-created' || event.type === 'list-deleted') {
+                if (["list-created", "list-deleted", "list-updated"].includes(event.type)) {
                     this.view.renderListen(this.model.lists);
-                    this.view.detailViewContainer.innerHTML = '';
+                    if (!this.activeList || event.type === 'list-deleted') {
+                        this.view.detailViewContainer.innerHTML = '';
+                    }
                 }
 
-                if (event.type === 'list-updated') {
-                    this.view.renderListen(this.model.lists);
-                }
-
-                if (this.activeList && event.listId === this.activeList.id) {
+                if (this.activeList && this.model.lists.some(l => l.id === this.activeList.id)) {
+                    this.activeList = this.model.lists.find(l => l.id === this.activeList.id);
                     this.view.renderDetailView(this.activeList);
                     this.setupAddItemButton();
                     this.setupItemEvents(this.activeList);
@@ -35,7 +35,7 @@ export default class Controller {
                 if (["tag-added", "tag-removed"].includes(event.type)) {
                     this.view.renderTags(this.model.getTags());
                     this.view.renderTagCheckboxes(this.model.getAllTags());
-                    this.view.updateNewArticleTagOptions(this.model.getTags());
+                    this.view.renderTagOptions(this.model.getTags());
                 }
             }
         });
@@ -65,10 +65,21 @@ export default class Controller {
                 return;
             }
 
-            const li = e.target.closest('li');
-            if (li && li.dataset.listId) {
+            const li = e.target.closest('li[data-list-id]');
+            if (li) {
                 const listId = parseInt(li.dataset.listId, 10);
-                this.activeList = this.model.lists.find(l => l.id === listId);
+                if (isNaN(listId)) {
+                    console.warn("Liste nicht gefunden für ID: NaN");
+                    return;
+                }
+
+                const list = this.model.lists.find(l => l.id === listId);
+                if (!list) {
+                    console.warn("Liste nicht gefunden für ID:", listId);
+                    return;
+                }
+
+                this.activeList = list;
                 this.view.renderDetailView(this.activeList);
                 this.setupAddItemButton();
                 this.setupItemEvents(this.activeList);
@@ -76,6 +87,7 @@ export default class Controller {
                 this.setupEditListTitleButton(this.activeList);
             }
         });
+
 
         this.view.closeSidebarButton.addEventListener('click', () => {
             this.view.toggleRightSidebar(false);
@@ -237,7 +249,6 @@ export default class Controller {
                 if (newTitle && newTitle !== list.title) {
                     this.model.updateListTitle(list.id, newTitle);
                 } else {
-                    // Wenn Titel leer oder gleich, einfach wieder zurückwechseln
                     this.view.renderDetailView(list);
                     this.setupAddItemButton();
                     this.setupItemEvents(list);
@@ -247,5 +258,4 @@ export default class Controller {
             });
         });
     }
-
 }
