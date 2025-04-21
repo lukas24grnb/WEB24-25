@@ -29,7 +29,7 @@ export default class View {
 
     renderListen(lists) {
         this.listenContainer.innerHTML = '';
-        lists.forEach(list => {
+        lists.forEach((list, index) => {
             const li = document.createElement('li');
             li.className = 'list-group-item d-flex justify-content-between align-items-center';
             if (list.completed) li.classList.add('list-completed');
@@ -45,9 +45,15 @@ export default class View {
             delBtn.dataset.listId = list.id;
             li.appendChild(delBtn);
 
+
+            if (index === lists.length - 1) {
+                li.classList.add('list-slide-in');
+            }
+
             this.listenContainer.appendChild(li);
         });
     }
+
 
     renderDetailView(list) {
         this.detailViewContainer.innerHTML = `
@@ -92,6 +98,8 @@ export default class View {
             li.innerHTML = `<span>${item.name}</span>`;
             this.availableItemsList.appendChild(li);
         });
+
+
     }
 
     renderTagCheckboxes(tags) {
@@ -148,6 +156,12 @@ export default class View {
     }
 
     toggleRightSidebar(show = true) {
-        this.rightSidebar.classList.toggle('d-none', !show);
+        const sidebar = this.rightSidebar;
+
+        if (show) {
+            sidebar.classList.add('active');
+        } else {
+            sidebar.classList.remove('active');
+        }
     }
 }

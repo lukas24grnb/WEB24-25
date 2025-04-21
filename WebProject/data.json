@@ -7,35 +7,35 @@
       "name": "🍎 Äpfel",
       "quantity": 1,
       "tag": "Obst",
-      "description": "Frisch vom Baum"
+      "description": "rot"
     },
     {
       "id": 2,
       "name": "🥕 Karotten",
       "quantity": 1,
       "tag": "Gemüse",
-      "description": "Bio Karotten"
+      "description": "Bio"
     },
     {
       "id": 3,
       "name": "🥛 Milch",
       "quantity": 1,
       "tag": "Getränke",
-      "description": "Fettarme H-Milch"
+      "description": "Fettarm"
     },
     {
       "id": 4,
       "name": "🍞 Brot",
       "quantity": 1,
       "tag": "Backwaren",
-      "description": "Vollkornbrot"
+      "description": ""
     },
     {
       "id": 5,
       "name": "🧻 Toilettenpapier",
       "quantity": 1,
       "tag": "Drogerie",
-      "description": "3-lagig, Recyclingpapier"
+      "description": ""
     }
   ],
 
@@ -51,14 +51,14 @@
           "name": "🍎 Äpfel",
           "quantity": 2,
           "tag": "Obst",
-          "description": "Frisch vom Baum"
+          "description": ""
         },
         {
           "id": 1002,
           "name": "🥛 Milch",
           "quantity": 1,
           "tag": "Getränke",
-          "description": "Fettarme H-Milch"
+          "description": ""
         }
       ]
     },
@@ -73,7 +73,7 @@
           "name": "🧻 Toilettenpapier",
           "quantity": 1,
           "tag": "Drogerie",
-          "description": "3-lagig, Recyclingpapier"
+          "description": ""
         }
       ]
     }

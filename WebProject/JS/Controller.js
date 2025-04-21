@@ -180,13 +180,19 @@ export default class Controller {
     setupAddItemButton() {
         if (!this.activeList || this.activeList.completed) return;
 
-        this.view.addItemButton?.addEventListener('click', () => {
+        const oldButton = this.view.addItemButton;
+        const newButton = oldButton.cloneNode(true); // kopiere Knoten ohne Events
+        oldButton.replaceWith(newButton); // ersetzt alten Button (löscht alte Events)
+        this.view.addItemButton = newButton;
+
+        newButton.addEventListener('click', () => {
             const tags = this.model.getAllTags();
             this.view.renderTagCheckboxes(tags);
             this.view.renderAvailableItems(this.model.getAvailableItems());
             this.view.toggleRightSidebar(true);
         });
     }
+
 
     setupItemEvents(list) {
         const ul = document.getElementById('list-item-ul');
