@@ -47,7 +47,7 @@
             <!-- Wird per JS befüllt -->
         </main>
 
-        <!-- Kontextbereich: Artikel-Auswahl -->
+
         <aside class="col-md-3 context-panel" id="rechte-sidebar">
         <div class="d-flex justify-content-between align-items-center">
                 <h5 id="sidebar-title">Artikel hinzufügen</h5>
@@ -60,7 +60,7 @@
             <section class="mt-3">
                 <h6 class="fw-bold">Nach Tags filtern:</h6>
                 <div id="tag-filter-checkboxes" class="d-flex flex-column gap-1">
-                    <!-- Checkboxen kommen per JS -->
+                    <!-- Dynamisch geladene Checkboxen für Tags -->
                 </div>
             </section>
 
@@ -68,7 +68,7 @@
             <section class="mt-4">
                 <h6 class="fw-bold">Verfügbare Artikel</h6>
                 <ul class="list-group mt-2" id="available-items-list">
-                    <!-- Artikel kommen per JS -->
+                    <!-- Dynamisch geladene Artikel mit Checkboxen -->
                 </ul>
 
                 <!-- Button zum Öffnen des Artikel-Formulars -->
@@ -101,7 +101,7 @@
                 <input type="text" id="new-article-input" placeholder="Artikelname" class="form-control mb-2" />
                 <select id="new-article-tag" class="form-select mb-2">
                     <option value="">Kategorie wählen...</option>
-                    <!-- Optionen kommen per JS -->
+                    <!-- Dynamisch geladene Optionen für Tags -->
                 </select>
                 <textarea id="new-article-description" class="form-control mb-2" placeholder="Beschreibung (optional)"></textarea>
                 <button class="btn btn-success w-100 mb-2" id="save-new-article-btn">Speichern</button>

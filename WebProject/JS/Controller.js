@@ -1,4 +1,4 @@
-// Neue vereinfachte Controller.js
+
 import Model from './model.js';
 import View from './view.js';
 import User from './Klassen/User.js';

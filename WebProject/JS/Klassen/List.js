@@ -4,8 +4,8 @@ export default class List {
     constructor(title, creator) {
         this.id = ++List.idCounter;
         this.title = title;
-        this.creator = creator; // User-Objekt
-        this.items = []; // Array von Item-Objekten
+        this.creator = creator;
+        this.items = [];
         this.sharedWith = [];
     }
 

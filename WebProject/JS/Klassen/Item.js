@@ -5,9 +5,9 @@ export default class Item {
         this.id = ++Item.idCounter;
         this.name = name;
         this.quantity = quantity;
-        this.completed = false; // Standardmäßig nicht erledigt
-        this.tag = tag; // Tag-Objekt oder null
-        this.image = image; // z. B. URL oder Base64
+        this.completed = false;
+        this.tag = tag;
+        this.image = image;
         this.description = description;
     }
 
