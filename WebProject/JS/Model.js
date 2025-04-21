@@ -1,4 +1,4 @@
-// model.js
+
 import Subject from './subject.js';
 import List from './Klassen/List.js';
 import Item from './Klassen/Item.js';

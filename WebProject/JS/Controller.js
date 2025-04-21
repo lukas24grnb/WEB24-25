@@ -1,5 +1,5 @@
 
-import Model from './model.js';
+import Model from './Model.js';
 import View from './view.js';
 import User from './Klassen/User.js';
 
