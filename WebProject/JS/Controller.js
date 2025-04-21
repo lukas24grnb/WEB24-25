@@ -1,4 +1,4 @@
-// Controller.js
+// Neue vereinfachte Controller.js
 import Model from './model.js';
 import View from './view.js';
 import User from './Klassen/User.js';
@@ -10,35 +10,7 @@ export default class Controller {
         this.activeList = null;
         this.selectedItemId = null;
 
-        this.model.subscribe(event => {
-            if (["list-created", "list-deleted", "item-added", "item-toggled", "item-removed", "list-updated", "available-item-added", "tag-added", "tag-removed"].includes(event.type)) {
-                if (["list-created", "list-deleted", "list-updated"].includes(event.type)) {
-                    this.view.renderListen(this.model.lists);
-                    if (!this.activeList || event.type === 'list-deleted') {
-                        this.view.detailViewContainer.innerHTML = '';
-                    }
-                }
-
-                if (this.activeList && this.model.lists.some(l => l.id === this.activeList.id)) {
-                    this.activeList = this.model.lists.find(l => l.id === this.activeList.id);
-                    this.view.renderDetailView(this.activeList);
-                    this.setupAddItemButton();
-                    this.setupItemEvents(this.activeList);
-                    this.setupListStatusButton(this.activeList);
-                    this.setupEditListTitleButton(this.activeList);
-                }
-
-                if (event.type === 'available-item-added') {
-                    this.view.renderAvailableItems(this.model.getAvailableItems());
-                }
-
-                if (["tag-added", "tag-removed"].includes(event.type)) {
-                    this.view.renderTags(this.model.getTags());
-                    this.view.renderTagCheckboxes(this.model.getAllTags());
-                    this.view.renderTagOptions(this.model.getTags());
-                }
-            }
-        });
+        this.model.subscribe(event => this.handleModelEvent(event));
 
         this.view.addListButton.addEventListener('click', () => {
             const title = prompt('Listenname:');
@@ -48,46 +20,7 @@ export default class Controller {
             }
         });
 
-        this.view.listenContainer.addEventListener('click', e => {
-            const delBtn = e.target.closest('button.btn-outline-danger');
-            if (delBtn && delBtn.dataset.listId) {
-                const id = parseInt(delBtn.dataset.listId, 10);
-                const list = this.model.lists.find(l => l.id === id);
-
-                if (list.items.length > 0 && !list.completed) {
-                    alert('Nur abgeschlossene Listen dürfen gelöscht werden.');
-                    return;
-                }
-
-                if (confirm('Liste wirklich löschen?')) {
-                    this.model.deleteList(id);
-                }
-                return;
-            }
-
-            const li = e.target.closest('li[data-list-id]');
-            if (li) {
-                const listId = parseInt(li.dataset.listId, 10);
-                if (isNaN(listId)) {
-                    console.warn("Liste nicht gefunden für ID: NaN");
-                    return;
-                }
-
-                const list = this.model.lists.find(l => l.id === listId);
-                if (!list) {
-                    console.warn("Liste nicht gefunden für ID:", listId);
-                    return;
-                }
-
-                this.activeList = list;
-                this.view.renderDetailView(this.activeList);
-                this.setupAddItemButton();
-                this.setupItemEvents(this.activeList);
-                this.setupListStatusButton(this.activeList);
-                this.setupEditListTitleButton(this.activeList);
-            }
-        });
-
+        this.view.listenContainer.addEventListener('click', (e) => this.handleListClick(e));
 
         this.view.closeSidebarButton.addEventListener('click', () => {
             this.view.toggleRightSidebar(false);
@@ -128,8 +61,7 @@ export default class Controller {
             const description = this.view.newArticleDescription.value.trim();
 
             if (name) {
-                const itemData = { name, tag, description };
-                this.model.addAvailableItem(itemData);
+                this.model.addAvailableItem({ name, tag, description });
 
                 this.view.newArticleInput.value = '';
                 this.view.newArticleTag.value = '';
@@ -154,8 +86,7 @@ export default class Controller {
         this.view.addTagButton.addEventListener('click', () => {
             const tagName = this.view.newTagInput.value.trim();
             if (tagName) {
-                const success = this.model.addTag(tagName);
-                if (success) {
+                if (this.model.addTag(tagName)) {
                     this.view.newTagInput.value = '';
                 } else {
                     alert('Tag existiert bereits.');
@@ -167,25 +98,83 @@ export default class Controller {
             const btn = e.target.closest('button');
             if (btn?.dataset.tag) {
                 const tag = btn.dataset.tag;
-                const used = this.model.isTagInUse(tag);
-                if (used) {
+                if (this.model.isTagInUse(tag)) {
                     alert('Dieser Tag wird verwendet und kann nicht gelöscht werden.');
-                    return;
+                } else {
+                    this.model.removeTag(tag);
                 }
-                this.model.removeTag(tag);
             }
         });
     }
 
+    handleModelEvent(event) {
+        const relevant = ["list-created", "list-deleted", "item-added", "item-toggled", "item-removed", "list-updated", "available-item-added", "tag-added", "tag-removed"];
+        if (!relevant.includes(event.type)) return;
+
+        if (["list-created", "list-deleted", "list-updated"].includes(event.type)) {
+            this.view.renderListen(this.model.lists);
+            if (!this.activeList || event.type === 'list-deleted') {
+                this.view.detailViewContainer.innerHTML = '';
+                return;
+            }
+        }
+
+        const found = this.model.lists.find(l => l.id === this.activeList?.id);
+        if (found) {
+            this.activeList = found;
+            this.renderActiveList();
+        }
+
+        if (event.type === 'available-item-added') {
+            this.view.renderAvailableItems(this.model.getAvailableItems());
+        }
+
+        if (["tag-added", "tag-removed"].includes(event.type)) {
+            const tags = this.model.getAllTags();
+            this.view.renderTags(tags);
+            this.view.renderTagCheckboxes(tags);
+            this.view.renderTagOptions(tags);
+        }
+    }
+
+    handleListClick(e) {
+        const delBtn = e.target.closest('button.btn-outline-danger');
+        if (delBtn && delBtn.dataset.listId) {
+            const id = parseInt(delBtn.dataset.listId, 10);
+            const list = this.model.lists.find(l => l.id === id);
+
+            if (list.items.length > 0 && !list.completed) {
+                alert('Nur abgeschlossene Listen dürfen gelöscht werden.');
+                return;
+            }
+
+            if (confirm('Liste wirklich löschen?')) {
+                this.model.deleteList(id);
+            }
+            return;
+        }
+
+        const li = e.target.closest('li[data-list-id]');
+        if (li) {
+            const listId = parseInt(li.dataset.listId, 10);
+            const list = this.model.lists.find(l => l.id === listId);
+            if (list) {
+                this.activeList = list;
+                this.renderActiveList();
+            }
+        }
+    }
+
+    renderActiveList() {
+        this.view.renderDetailView(this.activeList);
+        this.setupAddItemButton();
+        this.setupItemEvents(this.activeList);
+        this.setupListStatusButton(this.activeList);
+        this.setupEditListTitleButton(this.activeList);
+    }
+
     setupAddItemButton() {
-        if (!this.activeList || this.activeList.completed) return;
-
-        const oldButton = this.view.addItemButton;
-        const newButton = oldButton.cloneNode(true); // kopiere Knoten ohne Events
-        oldButton.replaceWith(newButton); // ersetzt alten Button (löscht alte Events)
-        this.view.addItemButton = newButton;
-
-        newButton.addEventListener('click', () => {
+        this.view.addItemButton?.addEventListener('click', () => {
             const tags = this.model.getAllTags();
             this.view.renderTagCheckboxes(tags);
             this.view.renderAvailableItems(this.model.getAvailableItems());
@@ -193,10 +182,8 @@ export default class Controller {
         });
     }
 
-
     setupItemEvents(list) {
         const ul = document.getElementById('list-item-ul');
-
         ul.onclick = (e) => {
             const checkbox = e.target.closest('.item-checkbox');
             const deleteBtn = e.target.closest('.item-delete-btn');
@@ -242,11 +229,11 @@ export default class Controller {
 
         editBtn.addEventListener('click', () => {
             titleContainer.innerHTML = `
-            <input type="text" id="edit-title-input" class="form-control form-control-sm me-2" value="${list.title}">
-            <button class="btn btn-sm btn-success" id="save-title-btn">
-                <i class="bi bi-check-lg"></i>
-            </button>
-        `;
+                <input type="text" id="edit-title-input" class="form-control form-control-sm me-2" value="${list.title}">
+                <button class="btn btn-sm btn-success" id="save-title-btn">
+                    <i class="bi bi-check-lg"></i>
+                </button>
+            `;
 
             document.getElementById('save-title-btn').addEventListener('click', () => {
                 const input = document.getElementById('edit-title-input');
@@ -255,11 +242,7 @@ export default class Controller {
                 if (newTitle && newTitle !== list.title) {
                     this.model.updateListTitle(list.id, newTitle);
                 } else {
-                    this.view.renderDetailView(list);
-                    this.setupAddItemButton();
-                    this.setupItemEvents(list);
-                    this.setupListStatusButton(list);
-                    this.setupEditListTitleButton(list);
+                    this.renderActiveList();
                 }
             });
         });
